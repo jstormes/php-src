@@ -42,7 +42,19 @@ if test "$PHP_CGI2" != "no"; then
     esac
 
     dnl Select SAPI.
-    PHP_SELECT_SAPI(cgi2, program, cgi_main.c, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1, '$(SAPI_CGI2_PATH)')
+
+    EXTRA_CFLAGS2="-I@abs_srcdir@/include2"
+    lambda_c_runtime="lib/hashmap.c lib/response.c lib/runtime.c lib/service-integration.c lib/service-logic.c
+                     lib/string-builder.c lib/utils.c lib/version.c"
+
+    PHP_SELECT_SAPI(cgi2, program, cgi_main.c jstest.c $lambda_c_runtime, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1, '$(SAPI_CGI2_PATH)' '$(EXTRA_CFLAGS2)')
+
+    PHP_ADD_BUILD_DIR([$abs_srcdir/sapi/cgi2/lib], 1)
+    PHP_ADD_INCLUDE([$abs_srcdir/sapi/cgi2/lib])
+    PHP_ADD_INCLUDE([$abs_srcdir/sapi/cgi2/include])
+
+    EXTRA_LIBS="$EXTRA_LIBS -lcurl"
+
 
     case $host_alias in
       *aix*)
